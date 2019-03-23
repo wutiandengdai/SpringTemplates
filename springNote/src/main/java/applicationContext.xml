@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default-init-method, default-destroy-method：全局定义默认初始化与销毁 -->
+<!-- 包含context的地址——支持标签 -->
+<beans xsi:schemaLocation="http://www.springframework.org/schema/beans
+ 	http://www.springframework.org/schema/beans/spring-beans.xsd
+ 	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+default-init-method="init" default-destroy-method="destroy"> 
+	
+	<!-- 全局开启标签，需在beans内加入三个context相关地址（schema/context;schema/context/spring-context.xsd;xmlns:context=schema/context ) -->
+	<context:annotation-config/>
+	
+ 	<!-- autowire: 属性名与上下文中bean名称相同 ，还可以是byType, constructor-->
+ 	<bean id="triangle" class="com.framework.spring.core.bean.Triangle" autowire="byName">
+ 	</bean>
+ 	
+ 	<!-- 2、常用注入 -->
+	<bean id="triangle2" class="com.framework.spring.core.bean.Triangle">
+		<!-- injection 1 -->
+		<property name="color" value="red"/>
+		
+		<!-- injection 1.2 (Object Injection) -->
+		<property name="pointA" ref="pointA"/>
+		
+		<!-- injection 1.3 (Inner Bean) -->
+		<property name="pointB">
+			<bean class="com.framework.spring.core.bean.Point">
+				<property name = "x" value="20"/>
+				<property name="y" value="0"/>
+			</bean>
+		</property>
+		<!--  doessn't work 
+		<property name="pointC">
+			<idref bean="pointC"/>
+		</property>-->
+		<property name="pointC" ref="pointC"/>
+	</bean>
+	
+	<bean id = "pointA" class="com.framework.spring.core.bean.Point">
+	<!-- autowire方式二：qualifier -->
+		<qualifier value="circleCenter"/>
+		<property name = "x" value="${pointA.pointX}"/>
+		<property name="y" value="${pointA.pointY}"/>
+	</bean>
+	<bean id = "pointC" class="com.framework.spring.core.bean.Point">
+		<property name = "x" value="0"/>
+		<property name="y" value="20"/>
+	</bean>
+	
+	<alias name="triangle" alias="triangle-alias"/>
+	
+	<!-- 注释rectangle bean定义，测试Component 标签 -->
+	<!-- <bean id="rectangle" class="com.framework.spring.core.bean.Rectangle">
+		injection 2： 构造函数，type=int 或 java.lang.String (定义类型); index从0开始索引
+		<constructor-arg index="0" type="int" value="20"/>
+		<constructor-arg type="int" value="15"/>
+		
+		<property name="color" value="red"/>
+	</bean> -->
+	
+	<!-- autowire方式一：命名为center， circle成员对象 Autowired 按名称匹配 -->
+	<!-- <bean id="center" class="com.framework.spring.core.bean.Point">
+		<property name ="x" value="20"/>
+		<property name="y" value="20"/>
+	</bean> -->
+	<bean id="circle" class="com.framework.spring.core.bean.Circle">
+		<property name="color" value="green"/>
+		<property name="radius" value="5"/>
+	</bean>
+	
+	
+	<bean id = "complexObject" class="com.framework.spring.core.bean.ComplexObject">
+		<property name = "adminEmails" >
+			<props>
+				<prop key="support">support@example.org</prop>
+				<prop key="development">development@example.org</prop>
+				<prop key="administrator">administrator@example.org</prop>
+			</props>
+		</property>
+		<property name="someList">
+			<list>
+				<value>Some List</value>
+				<ref bean="pointA"/>
+			</list>
+		</property>
+		<property name="someMap">
+			<map>
+				<entry key="an entry" value="some string"></entry>
+				<entry key="an ref" value-ref="pointA"></entry>
+			</map>
+		</property>
+		<property name="someSet">
+			<set>
+				<value>Some Set String</value>
+				<ref bean="pointC"/>
+			</set>
+		</property>
+	</bean>
+	
+	
+	<bean id="parentMovie" class="com.framework.spring.core.bean.Movie">
+		<property name="year" value="1997" />
+		<property name="hours" value="2.5"/>
+		<property name="actors">
+			<list>
+				<value>Cristophor</value>
+			</list>
+		</property>
+ 	</bean>
+ 	
+ 	<!-- abstract parent, without class, "abstract=true" can't be left out -->
+	<bean id="abstractParentMovie" abstract="true">
+		<property name="country" value="England" />
+		<property name="actors">
+			<list>
+				<value>JieLian Lee</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="movie1" class="com.framework.spring.core.bean.Movie" parent="parentMovie" init-method="myInit" destroy-method="cleanUp">
+		<!-- Override year from parent -->
+		<property name="year" value="2002"/>
+		<property name="name" value="Our Land"/>
+		<property name="country" value="China"/>
+		<property name="director" value="Chinese"/>
+		<property name="actors">
+			<!-- merge, 集合功能，保留父辈集合数据 -->
+			<list merge="true">
+				<value>Mochou Li</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="movie2" class="com.framework.spring.core.bean.Movie" parent = "abstractParentMovie">
+		<property name="year" value="2008"/>
+		<property name="name" value="Gone With the Wind"/>
+		<property name="hours" value="3.2"/>
+		<property name="director" value="English"/>
+		<property name="actors">
+			<list merge="true">
+				<value>Dongfang bubai</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- Stereotype： Component(general bean)、Service、Repository（Data）、Controller 扫描路径， 对应Component 标签，可省略本地的bean依赖 -->
+	<context:component-scan base-package="com.framework.spring.core"></context:component-scan>
+	
+	<!-- 支持字符串动态加载： 1、context.getMessage; 2、messageSource.getMessage -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>messages</value>
+				<value>messages_cn</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 注册 required标签,运行前检查 （ClassLoadBeanException)-->
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+	
+	<!-- 注册 Autowired 标签 -->
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+	
+	<!-- 注册BeanPostProcessor,完全独立，不需ID -->
+	<bean class="com.framework.spring.core.DisplayBeanPostProcessor"/>
+	
+	<!-- 注册BeanFactoryPostProcessor -->
+	<bean class="com.framework.spring.core.MyBeanFactoryPostProcessor"/>
+	
+	<!-- 注册Properties文件， ${}引用，如上pointA。以属性文件代替xml配置 -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="pointsConfig.properties"/>
+	</bean>
+</beans>

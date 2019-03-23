@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: accounts-web
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+     
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:1111/eureka/
+      
+error:
+  whitelabel:
+    enabled: false
