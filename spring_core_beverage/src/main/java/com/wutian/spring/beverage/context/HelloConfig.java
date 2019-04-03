@@ -1,12 +1,19 @@
 package com.wutian.spring.beverage.context;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.AbstractApplicationContext;
 
-@Configuration
+/**
+ * With @Configuration, no @Bean at getter needed
+ */
+// @Configuration
 class HelloConfig {
 
     private String header;
@@ -36,5 +43,21 @@ class HelloConfig {
         System.out.println(context.getBean("greeting"));
 
         ((AbstractApplicationContext) context).close();
+    }
+
+    /**
+     * The method called after properties are set on all beans
+     */
+    @PostConstruct
+    public void init(){
+        System.out.println(" Class " + HelloConfig.class.getName() + " inited!");
+    }
+
+    /**
+     * Excuted when ApplicationContext closes
+     */
+    @PreDestroy
+    public void destry(){
+        System.out.println(" Class " + HelloConfig.class.getName() + " destroyed!");
     }
 }

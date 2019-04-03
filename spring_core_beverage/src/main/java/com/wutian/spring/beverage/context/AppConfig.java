@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 @Import(DataConfig.class)
 @PropertySource("classpath:./application.properties")
 //@PropertySource("classpath:./application-${spring.profiles.active}.properties")
+@ComponentScan(basePackages = {"com.wutian.spring.beverage"})
 class AppConfig {
 
     /**
@@ -34,11 +36,11 @@ class AppConfig {
     @Value("${greetings.text}")
     private String greetingText;
     //Read the environment information
-    @Value("#{new Boolean(environment['spring.profiles.active']=='dev')}")
-    private static boolean isDev;
+    // @Value("#{new Boolean(environment['spring.profiles.active']=='dev')}")
+    // private static boolean isDev;
 
     @Bean
-    @Scope("prototype")
+    // @Scope("prototype")
     public HelloConfig getHelloConfig(){
         return new HelloConfig(this.greetingHeader, this.greetingText);
     }
@@ -69,11 +71,14 @@ class AppConfig {
     @Autowired
     private SalesOrderRepository salesOrderRepository;
 
-    @Bean
-    public OrderService getOrderService(InventoryService inventoryService, CustomerRepository customerRepository,
-            SalesOrderRepository salesOrderRepository) {
-        return new OrderServiceImpl(inventoryService, customerRepository, salesOrderRepository);
-    }
+    // Option 1
+    // @Bean
+    // public OrderService getOrderService(InventoryService inventoryService, CustomerRepository customerRepository,
+    //         SalesOrderRepository salesOrderRepository) {
+    //     return new OrderServiceImpl(inventoryService, customerRepository, salesOrderRepository);
+    // }
+
+    //Option 2: Add @Component or other stereotypes (@Service, @Controller) to target class; With ComponentScan added to this class at the same time
 
     @Bean
     public InventoryService getInventoryService(InventoryItemRepository inventoryItemRepository) {
