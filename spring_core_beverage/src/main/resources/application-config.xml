@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="customerRepository" class="com.wutian.spring.beverage.repository.CustomerRepository"/>
+    <bean id="inventoryItemRepository" class="com.wutian.spring.beverage.repository.InventoryItemRepository"/>
+    <bean id="salesOrderRepository" class="com.wutian.spring.beverage.repository.SalesOrderRepository"/>
+
+    <bean id="inventoryService" class="com.wutian.spring.beverage.service.impl.InventoryServiceImpl">
+        <constructor-arg ref="inventoryItemRepository"/>
+    </bean>
+    <bean id="orderService" class="com.wutian.spring.beverage.service.impl.OrderServiceImpl">
+        <constructor-arg name="inventoryService" ref="inventoryService"/>
+        <constructor-arg name="customerRepository" ref="customerRepository"/>
+        <constructor-arg name="salesOrderRepository" ref="salesOrderRepository"/>
+    </bean>
+</beans>

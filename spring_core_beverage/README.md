@@ -5,6 +5,7 @@
 <ul>
 <li>Application Context - Configuration, Profile, Bean Scope, EL</li>
 <li>Annotation Config - ComponentScan, Bean Lifecycle</li>
+<li>XML config</li>
 </ul>
 
 3. Run with <b>mvn -DargLine="-Dspring.profiles.active=dev" install</b>, the <b>mvn -Dspring.profiles.active=dev install</b> will not get you what you want.
